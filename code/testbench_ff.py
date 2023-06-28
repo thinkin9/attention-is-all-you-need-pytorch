@@ -263,12 +263,16 @@ print(relay_prog)
 ## 0628 15:03:여기까지는 잘됨
 
 # Option1
-graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(target, host=env.target_host))
-print(graph)
-print(lib)
-print(params)
+#graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(target, host=env.target_host))
+#print(graph)
+#print(lib)
+#print(params)
 #graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(env.target if device == "vta" else env.target_vta_cpu, host=env.target_host))
+## 0628 15:08:여기까지는 잘됨
 
 # Option2
-#graph, lib, params = relay.build( fn_encoder, target=tvm.target.Target(env.target if device == "vta" else env.target_vta_cpu, host=env.target_host))
-#graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(target, host=env.target_host), params=params)
+with tvm.transform.PassContext(opt_level=3, disabled_pass={"AlterOpLayout"}):
+    graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(target, host=env.target_host))
+    print(graph)
+    print(lib)
+    print(params)
