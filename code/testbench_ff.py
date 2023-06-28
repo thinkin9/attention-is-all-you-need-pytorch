@@ -219,19 +219,19 @@ def Encoder(q_input, w1, w2, gamma, beta):
     q = q_input
     residual = relay.copy(q)
     
-    q1 = relay.nn.dense(data=q, weight=w1)
-    #ret = relay.nn.matmul(tensor_a=q, tensor_b=w1)
+    #q1 = relay.nn.dense(data=q, weight=w1)
+    q1 = relay.nn.matmul(tensor_a=q, tensor_b=w1)
     
-    q2 = relay.nn.relu(data=q2)
+    q2 = relay.nn.relu(data=q1)
     
-    q3 = relay.nn.dense(data=q2, weight=w2)
-    #q1 = relay.nn.matmul(tensor_a=ret2, tensor_b=w2)
+    #q3 = relay.nn.dense(data=q2, weight=w2)
+    q3 = relay.nn.matmul(tensor_a=q2, tensor_b=w2)
     
-    q4 = relay.nn.dropout(data=q1, rate=dropout_rate)
+    q4 = relay.nn.dropout(data=q3, rate=dropout_rate)
     
     q5 = relay.add(lhs=q4, rhs=residual) 
     
-    q5_cast = relay.cast(q3, dtype="float32")
+    q5_cast = relay.cast(q5, dtype="float32")
     q6 = relay.nn.layer_norm(data=q5_cast, gamma=gamma, beta=beta, axis=-1, epsilon=epsilon_rate)
     return q5
 
@@ -250,3 +250,10 @@ build_start = time.time()
 
 fn_encoder = relay.Function([q_input, w1, w2, gamma, beta], q_output)
 print(fn_encoder)
+## 0628 14:54:여기까지는 잘됨
+
+fmod = tvm.IRModule.from_expr(fn)
+print(fmod)
+
+
+#graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(target, host=env.target_host), params=params)
