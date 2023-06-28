@@ -290,9 +290,10 @@ remote.upload(temp.relpath("graphlib.tar"))
 lib = remote.load_module("graphlib.tar")
 ## 0628 15:13: 오류 X
 
-if env.TARGET == "intelfocl":
-    ctxes = [remote.ext_dev(0), remote.cpu(0)]
-    m = graph_executor.create(graph, lib, ctxes)
-else:
-    # Graph runtime
-    m = graph_executor.create(graph, lib, ctx)
+# if env.TARGET == "intelfocl":
+#     ctxes = [remote.ext_dev(0), remote.cpu(0)]
+#     m = graph_executor.create(graph, lib, ctxes)
+#     오류 O
+# else:
+#     # Graph runtime
+m = graph_executor.create(graph, lib, ctx)
