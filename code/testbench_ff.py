@@ -23,7 +23,7 @@ env = vta.get_env()
 # device="arm_cpu"
 device = "vta"
 target = env.target if device == "vta" else env.target_vta_cpu
-
+print("env.target: ", target)
 
 #if env.TARGET not in ["sim", "tsim", "intelfocl"]:
 
@@ -252,8 +252,18 @@ fn_encoder = relay.Function([q_input, w1, w2, gamma, beta], q_output)
 print(fn_encoder)
 ## 0628 14:54:여기까지는 잘됨
 
-fmod = tvm.IRModule.from_expr(fn)
+# Front end compilation
+fmod = tvm.IRModule.from_expr(fn_encoder)
 print(fmod)
+## 0628 14:56:여기까지는 잘됨
 
+relay_prog = fmod["main"]
+print(relay_prog)
 
+# Option1
+#graph, lib = relay.build(fn_encoder, target="")
+#graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(env.target if device == "vta" else env.target_vta_cpu, host=env.target_host))
+
+# Option2
+#graph, lib, params = relay.build( fn_encoder, target=tvm.target.Target(env.target if device == "vta" else env.target_vta_cpu, host=env.target_host))
 #graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(target, host=env.target_host), params=params)
