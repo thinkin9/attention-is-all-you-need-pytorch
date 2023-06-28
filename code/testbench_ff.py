@@ -243,6 +243,7 @@ w2 = relay.var(name_hint="w2", shape=wff2_shape, dtype=env.wgt_dtype)
 
 gamma = relay.var(name_hint="gamma", shape=(d_model,), dtype="float32")
 beta = relay.var(name_hint="beta", shape=(d_model,), dtype="float32")
+
 q_output = Encoder(q_input, w1, w2, gamma, beta)
 
 # Measure build start time
