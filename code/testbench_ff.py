@@ -280,4 +280,11 @@ with tvm.transform.PassContext(opt_level=3, disabled_pass={"AlterOpLayout"}):
 ## No difference between Option 1 and 2
 build_time = time.time() - build_start
 print("Encoder" + " inference graph built in {0:.2f}s!".format(build_time))
+## Encoder Inference graph build in 0.14s
+## 0628 15:11:여기까지는 잘됨
 
+# Send the inference library over to the remote RPC server
+temp = utils.tempdir()
+lib.export_library(temp.relpath("graphlib.tar"))
+remote.upload(temp.relpath("graphlib.tar"))
+lib = remote.load_module("graphlib.tar")
