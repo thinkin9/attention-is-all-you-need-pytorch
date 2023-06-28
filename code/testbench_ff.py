@@ -259,9 +259,14 @@ print(fmod)
 
 relay_prog = fmod["main"]
 print(relay_prog)
+## relay_prog == fn_encoder
+## 0628 15:03:여기까지는 잘됨
 
 # Option1
-#graph, lib = relay.build(fn_encoder, target="")
+graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(target, host=env.target_host))
+print(graph)
+print(lib)
+print(params)
 #graph, lib, params = relay.build(fn_encoder, target=tvm.target.Target(env.target if device == "vta" else env.target_vta_cpu, host=env.target_host))
 
 # Option2
