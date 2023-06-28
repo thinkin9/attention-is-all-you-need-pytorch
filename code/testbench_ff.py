@@ -276,3 +276,8 @@ with tvm.transform.PassContext(opt_level=3, disabled_pass={"AlterOpLayout"}):
     print(graph)
     print(lib)
     print(params)
+    
+## No difference between Option 1 and 2
+build_time = time.time() - build_start
+print("Encoder" + " inference graph built in {0:.2f}s!".format(build_time))
+
