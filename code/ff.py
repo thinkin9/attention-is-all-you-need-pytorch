@@ -1,4 +1,6 @@
-# ENCODER_RELAY
+# FeedForward on VTA
+
+# Load VTA parameters
 
 # Load VTA parameters (3rdparty/vta-hw/config/vta_config.json file)
 import vta
@@ -15,18 +17,18 @@ assert tvm.runtime.enabled("rpc")
 
 pynq_host = os.environ.get("VTA_RPC_HOST", "192.168.1.152")
 pynq_port = os.environ.get("VTA_RPC_PORT", "9091")
-'''remote = rpc.connect(pynq_host, int(pynq_port))
+
+remote = rpc.connect(pynq_host, int(pynq_port))
 
 reconfig_start = time.time()
 vta.reconfig_runtime(remote)
 vta.program_fpga(remote, bitstream=None)
 reconfig_time = time.time() - reconfig_start
 print("Reconfigured FPGA and RPC runtime in {0:.2f}s!".format(reconfig_time))
-'''
-remote = rpc.LocalSession()
+#remote = rpc.LocalSession()
 
 # Get execution context from remote
-device = "sim"
+device = "vta"
 ctx = remote.ext_dev(0) if device == "vta" else remote.cpu(0)
 
 #print(env.wgt_dtype, env.inp_dtype)
@@ -269,38 +271,38 @@ lib = remote.load_module("graphlib.tar")
 
 m = graph_executor.create(graph, lib, ctx)
 
-seq = np.random.randint(16, size=(len_q, d_model), dtype=env.inp_dtype)
-w11 = np.random.randint(16, size=wff1_shape, dtype=env.wgt_dtype)
-w22 = np.random.randint(16, size=wff2_shape, dtype=env.wgt_dtype)
-g = np.ones((512,), dtype="float32")
-b = np.zeros((512,), dtype="float32")
-print(seq)
-print(env.BATCH)
+# seq = np.random.randint(16, size=(len_q, d_model), dtype=env.inp_dtype)
+# w11 = np.random.randint(16, size=wff1_shape, dtype=env.wgt_dtype)
+# w22 = np.random.randint(16, size=wff2_shape, dtype=env.wgt_dtype)
+# g = np.ones((512,), dtype="float32")
+# b = np.zeros((512,), dtype="float32")
+# print(seq)
+# print(env.BATCH)
 
-m.set_input("q", seq)
-m.set_input("w1", w11)
-m.set_input("w2", w22)
-m.set_input("gamma", g)
-m.set_input("beta", b)
+# m.set_input("q", seq)
+# m.set_input("w1", w11)
+# m.set_input("w2", w22)
+# m.set_input("gamma", g)
+# m.set_input("beta", b)
 
-# Perform inference and gather execution statistics
-# More on: :py:method:`tvm.runtime.Module.time_evaluator`
-num = 1  # number of times we run module for a single measurement
-rep = 1  # number of measurements (we derive std dev from this)
-timer = m.module.time_evaluator("run", ctx, number=num, repeat=rep)
-if env.TARGET in ["sim", "tsim"]:
-    simulator.clear_stats()
-    timer()
-    sim_stats = simulator.stats()
-    print("\nExecution statistics:")
-    for k, v in sim_stats.items():
-        # Since we execute the workload many times, we need to normalize stats
-        # Note that there is always one warm up run
-        # Therefore we divide the overall stats by (num * rep + 1)
-        print("\t{:<16}: {:>16}".format(k, v // (num * rep + 1)))
-import sys;sys.exit(0)
-tcost = timer()
-std = np.std(tcost.results) * 1000
-mean = tcost.mean * 1000
-print("\nPerformed inference in %.2fms (std = %.2f) for %d samples" % (mean, std, env.BATCH))
-print("Average per sample inference time: %.2fms" % (mean))
+# # Perform inference and gather execution statistics
+# # More on: :py:method:`tvm.runtime.Module.time_evaluator`
+# num = 1  # number of times we run module for a single measurement
+# rep = 1  # number of measurements (we derive std dev from this)
+# timer = m.module.time_evaluator("run", ctx, number=num, repeat=rep)
+# if env.TARGET in ["sim", "tsim"]:
+#     simulator.clear_stats()
+#     timer()
+#     sim_stats = simulator.stats()
+#     print("\nExecution statistics:")
+#     for k, v in sim_stats.items():
+#         # Since we execute the workload many times, we need to normalize stats
+#         # Note that there is always one warm up run
+#         # Therefore we divide the overall stats by (num * rep + 1)
+#         print("\t{:<16}: {:>16}".format(k, v // (num * rep + 1)))
+# import sys;sys.exit(0)
+# tcost = timer()
+# std = np.std(tcost.results) * 1000
+# mean = tcost.mean * 1000
+# print("\nPerformed inference in %.2fms (std = %.2f) for %d samples" % (mean, std, env.BATCH))
+# print("Average per sample inference time: %.2fms" % (mean))
